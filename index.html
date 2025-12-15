@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ノードグラフ</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="toolbar">
+    <div class="toolbar-group">
+      <button id="addPositivePower" class="btn-power"></button>
+      <button id="addNegativePower" class="btn-power"></button>
+    </div>
+
+    <div class="toolbar-group">
+      <button id="addAndGate" class="btn-gate"></button>
+      <button id="addOrGate" class="btn-gate"></button>
+      <button id="addNotGate" class="btn-gate"></button>
+      <button id="addXorGate" class="btn-gate"></button>
+    </div>
+
+    <div class="toolbar-group">
+      <button id="saveBtn" class="btn-file"></button>
+      <button id="loadBtn" class="btn-file"></button>
+      <button id="exportBtn" class="btn-file"></button>
+      <button id="importBtn" class="btn-file"></button>
+      <input type="file" id="importInput" style="display: none;" />
+    </div>
+  </div>
+
+  <div id="assetBox">
+    <strong>アセットマネージャー</strong>
+    <div class="toolbar-group" style="border:none; padding:0; flex-wrap: wrap; justify-content: space-between;">
+      <button id="saveAssetsBtn" class="btn-asset" style="flex:1;"></button>
+      <button id="loadAssetsBtn" class="btn-asset" style="flex:1;"></button>
+    </div>
+    <div style="display:flex; gap:5px; margin-top:5px;">
+       <button id="exportAssetsBtn" class="btn-asset" style="flex:1; font-size:10px;"></button>
+       <button id="importAssetsBtn" class="btn-asset" style="flex:1; font-size:10px;"></button>
+    </div>
+    <input id="importAssetsInput" type="file" accept=".json" style="display:none" />
+    
+    <div style="font-size:11px; color:#aaa; margin-top:5px;">保存されたアセット:</div>
+    <div id="assetList"></div>
+    <div style="font-size:10px; color:#888; text-align:center; margin-top:5px;">
+      ここにドラッグアンドドロップで登録
+    </div>
+  </div>
+
+  <div id="nodesContainer">
+    <canvas id="connectionCanvas"></canvas>
+  </div>
+
+  <script src="assets.js"></script>
+  <script src="history.js"></script> 
+  <script src="script.js"></script>
+  <script src="save.js"></script>
+  <script src="load.js"></script>
+  <script src="saveAssets.js"></script>
+
+  
+  <script>
+    function resizeCanvas() {
+      const canvas = document.getElementById('connectionCanvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight; 
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+  </script>
+</body>
+</html>

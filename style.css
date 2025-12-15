@@ -1,0 +1,375 @@
+/* style.css */
+
+/* =========================================
+   0. Central Management (Variables)
+   ========================================= */
+:root {
+  /* --- 1. カラーパレット (Colors) --- */
+  
+  /* 全体テーマ */
+  --c-bg: #222;
+  --c-grid: #333;
+  --c-text: #eee;
+  --c-panel-bg: rgba(50, 50, 50, 0.9);
+  --c-border: #555;
+  --c-border-highlight: #888;
+  
+  /* UI アクション */
+  --c-hover: #555;
+  --c-selected-glow: #8d8d8d; /* 選択時の発光色 */
+  
+  /* ワイヤー・ピン */
+  --c-pin-bg: #333;
+  --c-pin-border: #fff;
+  --c-pin-in: rgb(0, 153, 255);
+  --c-pin-out: rgb(255, 0, 0);
+  --c-wire-low: #00ffff;  /* OFF時の線 */
+  --c-wire-high: #ffff00; /* ON時の線 */
+
+  /* ゲート固有色 (SVG生成時に使用した色と合わせるための定義) */
+  /* ※注意: SVG Data URI内の色はここを変えても自動反映されません。文字列を差し替える必要があります */
+  --c-gate-and: #ffa500;
+  --c-gate-or:  #32cd32;
+  --c-gate-xor: #9370DB;
+  --c-gate-not: #ff69b4;
+  --c-io-pos:   #500000;
+  --c-io-neg:   #000080;
+  --c-io-pos-on: #ff4444; /* ON時の明るい赤 */
+  --c-io-neg-on: #4444ff; /* ON時の明るい青 */
+
+  --c-normal-true: #ffe066; /* normalノードがTrue時の背景色 */
+
+  /* --- 2. アイコン/形状データ (SVG Assets) --- */
+  
+  /* AND (D型 - Orange) */
+  --svg-and: url("data:image/svg+xml,%3Csvg viewBox='0 0 60 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5,5 L25,5 Q55,5 55,25 Q55,45 25,45 L5,45 Z' fill='%23ffa500' stroke='%23cc8400' stroke-width='2'/%3E%3C/svg%3E");
+
+  /* OR (Arrow - Green) */
+  --svg-or: url("data:image/svg+xml,%3Csvg viewBox='0 0 60 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5,5 Q25,25 5,45 Q35,45 55,25 Q35,5 5,5 Z' fill='%2332cd32' stroke='%23228b22' stroke-width='2'/%3E%3C/svg%3E");
+
+  /* XOR (Double Arrow - Purple) */
+  --svg-xor: url("data:image/svg+xml,%3Csvg viewBox='0 0 60 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,5 Q20,25 0,45' fill='none' stroke='%23e6daff' stroke-width='2'/%3E%3Cpath d='M8,5 Q28,25 8,45 Q38,45 58,25 Q38,5 8,5 Z' fill='%239370DB' stroke='%23e6daff' stroke-width='2'/%3E%3C/svg%3E");
+
+  /* NOT (Triangle - Pink) */
+  --svg-not: url("data:image/svg+xml,%3Csvg viewBox='0 0 60 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10,5 L50,20 L10,35 Z' fill='%23ff69b4' stroke='%23c71585' stroke-width='2'/%3E%3Ccircle cx='54' cy='20' r='4' fill='%23ff69b4' stroke='%23c71585' stroke-width='2'/%3E%3C/svg%3E");
+
+  /* Input (Square - Red) */
+  /* --svg-in: url("data:image/svg+xml,%3Csvg viewBox='0 0 80 40' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='76' height='36' rx='4' fill='%23800000' stroke='%23e74c3c' stroke-width='2'/%3E%3C/svg%3E"); */
+  --svg-pos: url("data:image/svg+xml,%3Csvg viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23800000' stroke='%23e74c3c' stroke-width='2'/%3E%3C/svg%3E");
+  --svg-pos-on: url("data:image/svg+xml,%3Csvg viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23ff4444' stroke='%23e74c3c' stroke-width='2'/%3E%3C/svg%3E");
+
+  /* Output (Square - Blue) */
+  /* --svg-out: url("data:image/svg+xml,%3Csvg viewBox='0 0 80 40' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='2' width='76' height='36' rx='4' fill='%23000080' stroke='%233498db' stroke-width='2'/%3E%3C/svg%3E"); */
+  --svg-neg: url("data:image/svg+xml,%3Csvg viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23000080' stroke='%233498db' stroke-width='2'/%3E%3C/svg%3E");
+  --svg-neg-on: url("data:image/svg+xml,%3Csvg viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='18' fill='%234444ff' stroke='%233498db' stroke-width='2'/%3E%3C/svg%3E");
+  
+  /* normal (Circle - white)*/
+  --svg-normal: url("data:image/svg+xml,%3Csvg viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='18' fill='%2300ffff' stroke='%23ffffff' stroke-width='2'/%3E%3C/svg%3E");
+  --svg-normal-on: url("data:image/svg+xml,%3Csvg viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23ffe066' stroke='%23d6ba3a' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+/* =========================================
+   1. Global & Layout
+   ========================================= */
+body {
+  margin: 0; overflow: hidden;
+  background-color: var(--c-bg);
+  font-family: 'Segoe UI', sans-serif;
+  color: var(--c-text);
+  background-image: linear-gradient(var(--c-grid) 1px, transparent 1px), linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+#nodesContainer { position: fixed; left: 0; top: 0; }
+#connectionCanvas { position: absolute; z-index: 0; pointer-events: none; }
+
+/* =========================================
+   2. Toolbar & Buttons
+   ========================================= */
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 10px; padding: 10px;
+  background: var(--c-grid);
+  border-bottom: 1px solid #444;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  z-index: 1000; position: relative;
+}
+.toolbar-group {
+  display: flex; gap: 5px; padding-right: 15px;
+  border-right: 1px solid #555; align-items: center;
+}
+.toolbar-group:last-child { border: none; }
+
+button {
+  background: #444; color: #fff;
+  border: 1px solid var(--c-border);
+  border-radius: 4px; cursor: pointer;
+  height: 34px; min-width: 40px; padding: 0 8px;
+  position: relative; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  font-size: 11px; font-weight: bold;
+}
+button:hover { background: var(--c-hover); transform: translateY(-1px); }
+
+#addPositivePower::after { content: "IN"; }
+#addNegativePower::after { content: "OUT"; }
+#addAndGate::after { content: "AND"; }
+#addOrGate::after  { content: "OR"; }
+#addNotGate::after { content: "NOT"; }
+#addXorGate::after { content: "XOR"; }
+#saveBtn::after   { content: "セーブ"; }
+#loadBtn::after   { content: "ロード"; }
+#exportBtn::after { content: "ファイルを書き出す"; }
+#importBtn::after { content: "ファイルを読み込む"; }
+#saveAssetsBtn::after   { content: "セーブ"; }
+#loadAssetsBtn::after   { content: "ロード"; }
+#exportAssetsBtn::after { content: "ファイルを書き出す"; }
+#importAssetsBtn::after { content: "ファイルを読み込む"; }
+
+.btn-gate, .btn-power {
+  color: transparent; overflow: visible; width: 50px;
+}
+.btn-gate::after, .btn-power::after {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  pointer-events: none; z-index: 2;
+}
+.btn-gate::before, .btn-power::before {
+  content: ""; position: absolute; inset: 0;
+  background-repeat: no-repeat; background-position: center;
+}
+.btn-gate:hover::before, .btn-power:hover::before { filter: brightness(1.2); }
+#addPositivePower::before { background-image: var(--svg-pos); background-size: contain; }
+#addNegativePower::before { background-image: var(--svg-neg); background-size: contain; }
+#addAndGate::before { background-image: var(--svg-and); background-size: 100% 100%; }
+#addOrGate::before  { background-image: var(--svg-or);  background-size: 100% 100%; }
+#addXorGate::before { background-image: var(--svg-xor); background-size: 100% 100%; }
+#addNotGate::before { background-image: var(--svg-not); background-size: 80% 80%; }
+#addPositivePower { border-bottom: 3px solid #e74c3c; }
+#addNegativePower { border-bottom: 3px solid #3498db; }
+
+/* =========================================
+   3. Nodes (Circuit Elements)
+   ========================================= */
+.node {
+  position: absolute;
+  width: 60px; height: 50px;
+  box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 12px; font-weight: bold;
+  user-select: none;
+  background-color: transparent !important;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0;
+}
+
+.node-label { pointer-events: none; z-index: 1; text-shadow: 0 0 2px #000; }
+
+/* 選択時: drop-shadow ではなくoutlineで強調 */
+.node.selected {
+  outline: 3px solid var(--c-selected-glow) !important;
+  z-index: 100;
+  /* drop-shadow 削除 */
+  filter: none !important;
+}
+
+/* 通常時hoverはdrop-shadow可能 */
+.node:hover {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+}
+
+/* --- SVG割り当て (Variables適用) --- */
+.node[data-type="and"] { background-image: var(--svg-and); }
+.node[data-type="or"]  { background-image: var(--svg-or);  padding-left: 10px; }
+.node[data-type="xor"] { background-image: var(--svg-xor); padding-left: 10px; }
+.node[data-type="not"] { background-image: var(--svg-not); width: 60px; height: 40px; padding-right: 5px; }
+
+.node[data-type="positive"], 
+.node[data-type="negative"] {
+  min-width: 0px; height: 40px; padding: 0 10px;
+}
+.node[data-type="normal"] {
+  height: 20px; padding: 0 10px;
+  width: 20px;
+}
+
+.node[data-type="positive"] { background-image: var(--svg-pos); }
+.node[data-type="negative"] { background-image: var(--svg-neg); }
+.node[data-type="normal"] { background-image: var(--svg-normal); }
+
+/* normalノードがTrueのとき、背景色を黄色に */
+.node[data-type="normal"]:not([data-is-on="true"]) {
+  background-image: var(--svg-normal);
+}
+.node[data-type="normal"][data-is-on="true"] {
+  background-image: var(--svg-normal-on) !important;
+}
+
+/* Output ON状態: drop-shadowで強調 */
+.node[data-type="negative"]:not([data-is-on="true"]) {
+  background-image: var(--svg-neg);
+}
+.node[data-type="negative"][data-is-on="true"] {
+  background-image: var(--svg-neg-on) !important;
+  filter: drop-shadow(0 0 5px var(--c-io-neg-on)) brightness(1.6) !important;
+}
+
+/* Input ON状態: drop-shadowで強調 */
+.node[data-type="positive"]:not([data-is-on="true"]) {
+  background-image: var(--svg-pos);
+}
+.node[data-type="positive"][data-is-on="true"] {
+  background-image: var(--svg-pos-on) !important;
+  filter: drop-shadow(0 0 5px var(--c-io-pos-on)) brightness(1.6) !important;
+}
+
+/* Input/OutputノードがONかつ選択中はoutlineで選択、drop-shadowでON状態を両立 */
+.node[data-type="positive"].selected,
+.node[data-type="negative"].selected {
+  outline: 3px solid var(--c-selected-glow) !important;
+  /* ON用drop-shadowも共存(下で指定) */
+}
+
+/* 選択＆ON状態どちらも満たした場合、両方の演出になるように（filterはON側, outlineは選択側） */
+
+/* =========================================
+   4. Pins
+   ========================================= */
+.pinsContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+.pin {
+  position: absolute; width: 10px; height: 10px;
+  border: 1px solid var(--c-pin-border); border-radius: 50%;
+  pointer-events: auto; cursor: crosshair;
+  background: var(--c-pin-bg);
+  z-index: 10;
+  box-shadow: 0 0 3px rgba(0,0,0,0.8);
+}
+.pin:hover { transform: scale(1.4); background: #fff; }
+
+.pin.in { background: var(--c-pin-in); }
+.pin.out { background: var(--c-pin-out); }
+
+/* style.css の #assetBox 関連部分を修正 */
+
+#assetBox {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  background-color: var(--c-panel-bg);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 20;
+  user-select: none;
+  color: #fff;
+  border: 1px solid var(--c-border);
+  width: 300px;
+  height: auto;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  transition: height 0.2s;
+}
+
+#assetBox strong {
+  display: block;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #555;
+  padding-bottom: 5px;
+}
+
+#assetBox.asset-drop-hover {
+  outline: 3px dashed var(--c-pin-in);
+  background: rgba(0,170,255,0.2);
+}
+
+#assetList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 5px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 50px;
+  padding-right: 5px;
+}
+
+#assetList::-webkit-scrollbar {
+  width: 6px;
+}
+#assetList::-webkit-scrollbar-thumb {
+  background-color: #666;
+  border-radius: 3px;
+}
+#assetList::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+}
+
+.asset-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  cursor: grab;
+  border: 1px solid transparent;
+}
+
+.asset-item:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.2);
+}
+.asset-item:active {
+  cursor: grabbing;
+}
+.asset-name {
+  flex: 1;
+  font-weight: bold;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 8px;
+}
+.asset-info {
+  font-size: 10px;
+  color: #aaa;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+.asset-delete-btn {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+  min-width: auto; 
+  height: auto;
+  border: none;
+}
+
+.asset-delete-btn:hover {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  transform: scale(1.1);
+}
+
+/* 選択矩形 */
+.selection-rect, #selectionRect {
+  position: fixed;
+  border: 1px dashed var(--c-pin-in);
+  background: rgba(0, 170, 255, 0.1);
+  pointer-events: none; z-index: 9999;
+}
