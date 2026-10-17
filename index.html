@@ -1,74 +1,101 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ノードグラフ</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>論理回路シミュレーター</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 50'%3E%3Cpath d='M8,5 H30 A22,20 0 0 1 30,45 H8 Z' fill='%23f0a33a'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <header class="toolbar">
+    <div class="brand" title="論理回路シミュレーター">論理回路<br>シミュレーター</div>
 
-  <div class="toolbar">
-    <div class="toolbar-group">
-      <button id="addPositivePower" class="btn-power"></button>
-      <button id="addNegativePower" class="btn-power"></button>
+    <div class="tb-group palette" id="palette" role="group" aria-label="部品"></div>
+
+    <div class="tb-group" role="group" aria-label="編集">
+      <button type="button" class="tb-btn" data-action="undo" title="元に戻す (Ctrl+Z)">↶<span>元に戻す</span></button>
+      <button type="button" class="tb-btn" data-action="redo" title="やり直し (Ctrl+Y)">↷<span>やり直し</span></button>
+      <button type="button" class="tb-btn" data-action="delete" title="選択を削除 (Delete)">✕<span>削除</span></button>
     </div>
 
-    <div class="toolbar-group">
-      <button id="addAndGate" class="btn-gate"></button>
-      <button id="addOrGate" class="btn-gate"></button>
-      <button id="addNotGate" class="btn-gate"></button>
-      <button id="addXorGate" class="btn-gate"></button>
+    <div class="tb-group" role="group" aria-label="ファイル">
+      <button type="button" class="tb-btn" data-action="new" title="キャンバスを空にする">□<span>新規</span></button>
+      <button type="button" class="tb-btn" data-action="open" title="回路ファイル（.json）を開く">⇪<span>開く</span></button>
+      <button type="button" class="tb-btn" data-action="save" title="回路をファイル（.json）に書き出す">⇩<span>保存</span></button>
     </div>
 
-    <div class="toolbar-group">
-      <button id="saveBtn" class="btn-file"></button>
-      <button id="loadBtn" class="btn-file"></button>
-      <button id="exportBtn" class="btn-file"></button>
-      <button id="importBtn" class="btn-file"></button>
-      <input type="file" id="importInput" style="display: none;" />
+    <div class="tb-group" role="group" aria-label="解析">
+      <button type="button" class="tb-btn" data-action="truth" title="入力スイッチと出力ランプの真理値表">⊞<span>真理値表</span></button>
+      <button type="button" class="tb-btn wide" data-action="clock" hidden>⏸ クロック停止</button>
     </div>
-  </div>
 
-  <div id="assetBox">
-    <strong>アセットマネージャー</strong>
-    <div class="toolbar-group" style="border:none; padding:0; flex-wrap: wrap; justify-content: space-between;">
-      <button id="saveAssetsBtn" class="btn-asset" style="flex:1;"></button>
-      <button id="loadAssetsBtn" class="btn-asset" style="flex:1;"></button>
+    <div class="tb-group view" role="group" aria-label="表示">
+      <label class="field">配線
+        <select id="wireStyle">
+          <option value="curve">曲線</option>
+          <option value="step">直角</option>
+          <option value="straight">直線</option>
+        </select>
+      </label>
+      <label class="field check"><input type="checkbox" id="snapToggle"> グリッド吸着</label>
+      <div class="zoom">
+        <button type="button" class="tb-btn sq" data-action="zoom-out" title="縮小">−</button>
+        <button type="button" class="tb-btn zoom-label" data-action="zoom-reset" id="zoomLabel" title="100% に戻す">100%</button>
+        <button type="button" class="tb-btn sq" data-action="zoom-in" title="拡大">＋</button>
+      </div>
+      <button type="button" class="tb-btn" data-action="fit" title="回路全体が見えるように表示">⤢<span>全体</span></button>
+      <button type="button" class="tb-btn sq help-btn" data-action="help" title="操作方法">?</button>
     </div>
-    <div style="display:flex; gap:5px; margin-top:5px;">
-       <button id="exportAssetsBtn" class="btn-asset" style="flex:1; font-size:10px;"></button>
-       <button id="importAssetsBtn" class="btn-asset" style="flex:1; font-size:10px;"></button>
+  </header>
+
+  <main class="workspace">
+    <svg id="board" tabindex="0" aria-label="回路キャンバス"></svg>
+
+    <div id="emptyHint" class="empty-hint">
+      <p class="big">ツールバーから部品を追加して、ピン同士をドラッグでつなぎましょう</p>
+      <p>左下のアセットから「半加算回路」などをドラッグして配置することもできます。<br>
+        操作方法は右上の <b>?</b> から確認できます。</p>
     </div>
-    <input id="importAssetsInput" type="file" accept=".json" style="display:none" />
-    
-    <div style="font-size:11px; color:#aaa; margin-top:5px;">保存されたアセット:</div>
-    <div id="assetList"></div>
-    <div style="font-size:10px; color:#888; text-align:center; margin-top:5px;">
-      ここにドラッグアンドドロップで登録
-    </div>
-  </div>
 
-  <div id="nodesContainer">
-    <canvas id="connectionCanvas"></canvas>
-  </div>
+    <aside id="assetPanel" aria-label="アセット">
+      <div class="panel-head">
+        <button type="button" class="icon-btn" data-action="panel-toggle" aria-expanded="true" title="開く / 閉じる">▾</button>
+        <strong>アセット</strong>
+        <button type="button" class="small-btn" data-action="asset-add" title="選択中の部品をアセットとして登録">＋ 選択を登録</button>
+      </div>
+      <div class="panel-body">
+        <div id="assetList"></div>
+        <div class="panel-drop">選択した部品をここへドラッグしても登録できます</div>
+        <div class="panel-actions">
+          <button type="button" class="small-btn" data-action="asset-import" title="アセットファイル（.json）を読み込んで追加">読み込み</button>
+          <button type="button" class="small-btn" data-action="asset-export" title="アセットをファイルに書き出す">書き出し</button>
+          <button type="button" class="small-btn" data-action="asset-starter" title="標準アセット（加算回路など）を再追加">標準を追加</button>
+        </div>
+      </div>
+    </aside>
 
-  <script src="assets.js"></script>
-  <script src="history.js"></script> 
-  <script src="script.js"></script>
-  <script src="save.js"></script>
-  <script src="load.js"></script>
-  <script src="saveAssets.js"></script>
+    <footer class="statusbar">
+      <span id="statusHint"></span>
+      <span class="spacer"></span>
+      <span id="statusCounts"></span>
+      <span id="statusSim" class="ok">● 安定</span>
+    </footer>
+  </main>
 
-  
-  <script>
-    function resizeCanvas() {
-      const canvas = document.getElementById('connectionCanvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight; 
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-  </script>
+  <div id="assetPreview" aria-hidden="true"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <dialog id="dialog"></dialog>
+  <input type="file" id="fileInput" accept=".json,application/json" hidden>
+
+  <script src="js/components.js"></script>
+  <script src="js/circuit.js"></script>
+  <script src="js/shapes.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/starterAssets.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
